@@ -17,10 +17,12 @@ import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import VerifiedIcon from '@mui/icons-material/Verified';
+import axios from 'axios'
+import {useNavigate} from 'react-router-dom'
 
 const Signup = () => {
   const theme = createTheme();
-
+  const navigate = useNavigate();
   const [values, setValues] = useState({
     firstName: "",
     lastName: "",
@@ -31,6 +33,12 @@ const Signup = () => {
     showPassword: false,
   });
 
+  const [otp, setOtp] = useState()
+  const [checkOtp, setCheckOtp] = useState({
+    statement : false,
+    name : "Send OTP",
+    state : false
+  })
   const handleClickShowPassword = () => {
     setValues({
       ...values,
@@ -38,9 +46,60 @@ const Signup = () => {
     });
   };
 
+  const [disableNum, setDisableNum] = useState(false)
+  console.log(checkOtp);
+  console.log(otp)
+
+  const checkPass = () => {
+    if(values.OTP === otp)
+    {
+        setCheckOtp({...checkOtp,state:true})
+        setDisableNum(true)
+    }
+    else
+    {
+        alert("Please enter correct OTP");
+    }
+  }
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
   };
+
+    const sendSms = () => {
+        values.mobileNum && values.mobileNum.length === 10 ?
+        axios.post("http://localhost:8450/otp",{
+          number : values.mobileNum
+        })
+        .then((res)=>{
+          console.log(res)
+          setOtp(res.data.otp)
+          setCheckOtp({statement : true,name:"Verify OTP"});
+          
+        })
+        .catch((err)=>{console.log(err)})
+        :
+        alert("Enter Mobile number of 10 digits")
+      };
+
+    const handleSubmit = () => {
+        checkOtp.state === true 
+        ?
+        axios.post("http://localhost:8450/user/signup",{
+            values
+        })
+        .then((res)=>{console.log(res)})
+        .catch((err)=>{
+            err.response.data.status.keyValue.mobileNum &&
+            alert(`Mobile Number : ${err.response.data.status.keyValue.mobileNum} already exist`)
+
+            err.response.data.status.keyValue.username &&
+            alert(`Username : ${err.response.data.status.keyValue.username} already exist`)    
+        })
+
+        :
+        alert("Please verify the number")
+    }  
+
 
   return (
     <div>
@@ -95,10 +154,14 @@ const Signup = () => {
                       startAdornment: (
                         <InputAdornment position="start">+91</InputAdornment>
                       ),
+                      maxLength: 10,
+                      minLength: 10,
+                      readOnly: disableNum === true ? true : false
                     }}
                     onChange={(e) => {
                       setValues({ ...values, mobileNum: e.target.value });
                     }}
+                    erorText="Please enter only 10 digits number"
                   />
                 </Grid>
                 <Button
@@ -106,11 +169,9 @@ const Signup = () => {
                 variant="contained"
                 sx={{ mt: 3, mb: 2,ml:2 }}
                 sm={4}
-                onClick={() => {
-                  console.log("values", values);
-                }}
+                onClick={checkOtp.statement === true ? checkPass : sendSms}
               >
-                Send OTP
+                {checkOtp.name}
               </Button>
                 <Grid item xs={6} sm={6}>
                   <TextField
@@ -118,14 +179,17 @@ const Signup = () => {
                     label="OTP"
                     autoComplete="otp"
                     onChange={(e) => {
-                      setValues({ ...values, OTP: e.target.value });
+                      setValues({ ...values, OTP: parseInt(e.target.value) });
                     }}
                   />
                 </Grid>
 
-                {/* <div class="alert alert-success mt-3 ms-5" role="alert" style={{paddingTop:"-10px"}}>
-                    Verified!<VerifiedIcon sx={{ml:1 }}/>
-                </div> */}
+                { 
+                    checkOtp.state === true &&
+                    <div class="alert alert-success mt-3 ms-5" role="alert">
+                        Verified!<VerifiedIcon sx={{ml:1 }}/>
+                    </div> 
+                }
                 <Grid item xs={12}>
                   <FormControl variant="outlined" fullWidth>
                     <InputLabel htmlFor="outlined-adornment-password">
@@ -164,7 +228,6 @@ const Signup = () => {
                     fullWidth
                     name="username"
                     label="Username"
-                    type="text"
                     id="username"
                     autoComplete="username"
                     onChange={(e) => {
@@ -177,9 +240,7 @@ const Signup = () => {
                 fullWidth
                 variant="contained"
                 sx={{ mt: 3, mb: 2 }}
-                onClick={() => {
-                  console.log("values", values);
-                }}
+                onClick={handleSubmit}
               >
                 Submit
               </Button>
@@ -188,7 +249,7 @@ const Signup = () => {
                   <a href="/">Forgot Password?</a>
                 </div>
                 <div>
-                  <a href="/">Sign In?</a>
+                  <a href="/login">Sign In?</a>
                 </div>
               </div>
             </Box>
