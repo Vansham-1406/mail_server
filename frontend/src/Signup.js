@@ -231,7 +231,6 @@ const Signup = () => {
                     id="username"
                     autoComplete="username"
                     onChange={(e) => {
-                      setValues({ ...values, username: e.target.value });
                       setValues({ ...values, username:  e.target.value });
                     }}
                   />
