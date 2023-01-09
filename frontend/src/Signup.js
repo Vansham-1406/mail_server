@@ -232,6 +232,7 @@ const Signup = () => {
                     autoComplete="username"
                     onChange={(e) => {
                       setValues({ ...values, username: e.target.value });
+                      setValues({ ...values, username:  e.target.value });
                     }}
                   />
                 </Grid>
@@ -246,10 +247,9 @@ const Signup = () => {
               </Button>
               <div className="d-flex justify-content-between mb-5">
                 <div>
-                  <a href="/">Forgot Password?</a>
-                </div>
-                <div>
-                  <a href="/login">Sign In?</a>
+                  <p onClick={()=>{
+                    navigate("/login")
+                  }} className="text-decoration-none text-secondary">Already a user?</p>
                 </div>
               </div>
             </Box>
