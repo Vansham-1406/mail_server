@@ -5,6 +5,7 @@ import TextField from "@mui/material/TextField";
 import Link from "@mui/material/Link";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
+import Alert from "@mui/material/Alert";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import InputAdornment from "@mui/material/InputAdornment";
 import Typography from "@mui/material/Typography";
@@ -16,26 +17,57 @@ import IconButton from "@mui/material/IconButton";
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import OutlinedInput from "@mui/material/OutlinedInput";
+import Modal from "@mui/material/Modal";
 import axios from "axios";
-import {useNavigate} from 'react-router-dom'
+import { useNavigate } from "react-router-dom";
+import "../node_modules/bootstrap/dist/css/bootstrap.css";
+
+const style = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 500,
+  bgcolor: "background.paper",
+  boxShadow: 24,
+  p: 4,
+};
 
 const Login = () => {
   const theme = createTheme();
   const navigate = useNavigate();
   const [values, setValues] = useState({
     username: "",
-    password: ""
+    password: "",
+  });
+
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+  const [user, setUser] = useState({
+    mobile : "",
+    password : ""
+  })
+  const [otp, setOtp] = useState();
+  const [mainOtp, setmainOtp] = useState();
+  const [otpChecker, setOtpChecker] = useState({
+    validateMobile: true,
+    otpSent: false,
+    changePass: false,
   });
 
   const handleSubmit = () => {
-    axios.post("http://localhost:8450/user/login", values)
-    .then((res)=>{
-      navigate("/home")
-    })
-    .catch((err)=>{
-      alert(`${err.response.data.msg}`)  
-    })
-  }
+    axios
+      .post("http://localhost:8450/user/login", values)
+      .then((res) => {
+        navigate("/home");
+        localStorage.setItem("userData", JSON.stringify(res.data.user));
+      })
+      .catch((err) => {
+        alert(`${err.response.data.msg}`);
+      });
+  };
+
   const handleClickShowPassword = () => {
     setValues({
       ...values,
@@ -47,6 +79,43 @@ const Login = () => {
     event.preventDefault();
   };
 
+  const sendMobile = () => {
+    user.mobile && user.mobile.length === 10
+      ? axios
+          .post("http://localhost:8450/otpLogin", {
+            number: user.mobile,
+          })
+          .then((res) => {
+            console.log(res);
+            setOtp(res.data.otp);
+            setOtpChecker({ validateMobile: false, otpSent: true });
+          })
+          .catch((err) => {
+            alert(`${err.response.data.msg}`)
+          })
+      : alert("Enter Mobile number of 10 digits");
+  };
+
+  const checkOtp = () => {
+    if (mainOtp === otp) {
+      setOtpChecker({
+        validateMobile: false,
+        otpSent: false,
+        changePass: true,
+      });
+    } else {
+      alert("Please enter correct OTP");
+    }
+  };
+
+  const changePassword = () => {
+    axios.put("http://localhost:8450/user/setup",user)
+    .then((response)=>{
+      alert("Password changed successfully")
+      handleClose()
+    })
+    .catch((err)=>{console.log(err)})
+  }
   return (
     <div>
       <ThemeProvider theme={theme}>
@@ -116,14 +185,145 @@ const Login = () => {
               </Button>
               <Grid container>
                 <Grid item xs>
-                  <Link href="#" variant="body2" style={{cursor:"pointer",textDecoration:"none"}}>
+                  <Link
+                    href="#"
+                    variant="body2"
+                    style={{ cursor: "pointer", textDecoration: "none" }}
+                    onClick={handleOpen}
+                  >
                     Forgot password?
                   </Link>
+                  <Modal
+                    open={open}
+                    onClose={handleClose}
+                    aria-labelledby="modal-modal-title"
+                    aria-describedby="modal-modal-description"
+                  >
+                    <Box
+                      sx={style}
+                      className="d-flex justify-content-center flex-column align-items-center"
+                    >
+                      <Grid className="d-flex justify-content-center align-items-center flex-column">
+                        {/* TO SEND OTP  */}
+                        {otpChecker.validateMobile && (
+                          <div>
+                            <h4 className=" mb-4">Account Recovery</h4>
+                            <TextField
+                              style={{ width: "350px" }}
+                              label="Mobile Number"
+                              id="outlined-start-adornment"
+                              name="mobile"
+                              autoComplete="mobile"
+                              InputProps={{
+                                startAdornment: (
+                                  <InputAdornment position="start">
+                                    +91
+                                  </InputAdornment>
+                                ),
+                                maxLength: 10,
+                                minLength: 10,
+                              }}
+                              erorText="Please enter only 10 digits number"
+                              onChange={(e) => {
+                                setUser({...user,mobile : e.target.value})
+                              }}
+                            />
+                            <Button
+                              variant="contained"
+                              style={{ width: "150px" }}
+                              className="mt-4"
+                              onClick={sendMobile}
+                            >
+                              SEND OTP
+                            </Button>
+                          </div>
+                        )}
+
+                        {/* TO CHECK OTP  */}
+                        {otpChecker.otpSent && (
+                          <div>
+                            <h4 className="fw-bold">Enter OTP recieved</h4>
+                            <div className="d-flex justify-content-between mt-4">
+                              <TextField
+                                label="OTP"
+                                InputLabelProps={{
+                                  shrink: true,
+                                }}
+                                variant="standard"
+                                onChange={(e) => {
+                                  setmainOtp(parseInt(e.target.value));
+                                }}
+                              />
+                            </div>
+                            <Button
+                              variant="contained"
+                              className="mt-4"
+                              onClick={checkOtp}
+                            >
+                              VERIFY
+                            </Button>
+                          </div>
+                        )}
+
+                        {/* CHANGE PASSWORD  */}
+                        {otpChecker.changePass && (
+                          <div>
+                            <Alert severity="success">OTP VERIFIED!</Alert>
+                            <Grid className="d-flex flex-column">
+                              <FormControl
+                                variant="outlined"
+                                style={{ width: "350px" }}
+                                className="mt-4"
+                              >
+                                <InputLabel htmlFor="outlined-adornment-password">
+                                  Password
+                                </InputLabel>
+                                <OutlinedInput
+                                  id="outlined-adornment-password"
+                                  type={
+                                    values.showPassword ? "text" : "password"
+                                  }
+                                  value={user.password}
+                                  onChange={(e) => {
+                                    setUser({...user,password : e.target.value})
+                                  }}
+                                  endAdornment={
+                                    <InputAdornment position="end">
+                                      <IconButton
+                                        aria-label="toggle password visibility"
+                                        onClick={handleClickShowPassword}
+                                        onMouseDown={handleMouseDownPassword}
+                                        edge="end"
+                                      >
+                                        {values.showPassword ? (
+                                          <VisibilityOff />
+                                        ) : (
+                                          <Visibility />
+                                        )}
+                                      </IconButton>
+                                    </InputAdornment>
+                                  }
+                                  label="Password"
+                                />
+                              </FormControl>
+                              <Button variant="contained" className="mt-4" onClick={changePassword}>
+                                Change Password
+                              </Button>
+                            </Grid>
+                          </div>
+                        )}
+                      </Grid>
+                    </Box>
+                  </Modal>
                 </Grid>
                 <Grid item>
-                  <Link onClick={()=>{
-                    navigate("/signup")
-                  }} variant="body2" style={{cursor:"pointer",textDecoration:"none"}}>
+                  <Link
+                    onClick={() => {
+                      navigate("/signup");
+                    }}
+                    variant="body2"
+                    style={{ cursor: "pointer", textDecoration: "none" }}
+                  >
                     {"Don't have an account? Sign Up"}
                   </Link>
                 </Grid>

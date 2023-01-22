@@ -1,5 +1,8 @@
 const User = require("../model/userModel");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken")
+
+const secretKey = "Vansham_MailServer"
 exports.userRegister = async (req, res) => {
   try {
     const newU = req.body.values;
@@ -28,16 +31,20 @@ exports.userLogin = async (req, res) => {
   try {
     const { password } = req.body;
     let user;
-    if (isNaN(req.body.username)) {
-      user = await User.findOne({ username: req.body.username.toLowerCase() });
-    } else {
+    if (isNaN(req.body.username)) 
+    {
+      user = await User.findOne({ username: req.body.username });
+    } 
+    else 
+    {
       user = await User.findOne({ mobileNum: req.body.username });
     }
 
-    console.log(user);
     if (user) 
     {
       const checkPass = bcrypt.compareSync(password, user.password);
+  
+      const token = await jwt.sign({user},secretKey,{expiresIn:"300s"})
       if (checkPass) 
       {
         res.status(200).json({
@@ -48,6 +55,7 @@ exports.userLogin = async (req, res) => {
             lastName: user.lastName,
             mobileNum: user.mobileNum,
             id: user._id,
+            token : token
           },
         });
       } 
@@ -66,3 +74,32 @@ exports.userLogin = async (req, res) => {
     res.status(400).json({ msg: "Error", error:error });
   }
 };
+
+exports.setUp = async (req,res) => 
+{
+  try 
+  {
+    const user = req.body;
+    const login = await User.findOne({mobileNum : user.mobile})
+    console.log(login)
+    if(login)
+    {
+      const hashPass = bcrypt.hashSync(user.password, 10);
+      login.password = hashPass;
+
+      const userUpdate = await User.findByIdAndUpdate(login.id,login,{
+        new : true
+      })
+
+      return res.status(201).json({response : userUpdate, msg : "Password Changed successfully"})
+    }
+    else
+    {
+      return res.status(400).json({msg:"failed"})
+    }
+  } 
+  catch (error)
+  {
+    return res.status(400).json({msg:"failed",error : error})
+  }
+}

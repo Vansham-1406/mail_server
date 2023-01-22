@@ -139,6 +139,7 @@ const Home = () => {
             }}
         />
         </>
+          <img src='../logo.png' style={{height:"90px",width:"100px"}} className="d-flex justify-content-center align-items-center"/>
         <div className='position-absolute top-50 start-50 translate-middle d-flex flex-column text-light text-center'>
             <p className='fs-6 fw-bold'>Welcome to Mail Server!</p>
             <p className='fs-6'>Login/Sigup to send mails freely!</p>

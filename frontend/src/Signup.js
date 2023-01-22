@@ -67,7 +67,7 @@ const Signup = () => {
 
     const sendSms = () => {
         values.mobileNum && values.mobileNum.length === 10 ?
-        axios.post("http://localhost:8450/otp",{
+        axios.post("http://localhost:8450/otpRegister",{
           number : values.mobileNum
         })
         .then((res)=>{
@@ -76,7 +76,9 @@ const Signup = () => {
           setCheckOtp({statement : true,name:"Verify OTP"});
           
         })
-        .catch((err)=>{console.log(err)})
+        .catch((err)=>{
+          alert(`${err.response.data.msg}`);
+        })
         :
         alert("Enter Mobile number of 10 digits")
       };
@@ -87,7 +89,10 @@ const Signup = () => {
         axios.post("http://localhost:8450/user/signup",{
             values
         })
-        .then((res)=>{console.log(res)})
+        .then((res)=>{
+          alert("Registered Successfully, Now login!")
+          navigate("/login")
+        })
         .catch((err)=>{
             err.response.data.status.keyValue.mobileNum &&
             alert(`Mobile Number : ${err.response.data.status.keyValue.mobileNum} already exist`)
@@ -248,7 +253,7 @@ const Signup = () => {
                 <div>
                   <p onClick={()=>{
                     navigate("/login")
-                  }} className="text-decoration-none text-secondary">Already a user?</p>
+                  }} className="text-decoration-none text-secondary" style={{cursor:"pointer"}}>Already a user?</p>
                 </div>
               </div>
             </Box>
