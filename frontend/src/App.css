@@ -4,6 +4,10 @@
     font-family: sans-serif;
 }
 
+*:focus{
+    border: none;
+}
+
 .home_banner{
     width: 100vw;
     height: 100vh;
@@ -36,7 +40,7 @@
 .mainNav{
     width: 100vw;
     background-color: #1876D1;
-    transition: .4s all ease;
+    transition: .4s margin ease;
 }
 
 .hamburger:hover{
@@ -49,6 +53,7 @@
 
 .marg{
     margin-top: 20px;
+    margin-right: 59px;
 }
 
 .mainNav1{
@@ -64,6 +69,7 @@
     background-color: white;
     border-right: 1px solid #E0E0E0;
     transition: width .4s;
+    height: 90vh;
 }
 
 .navbar1{
@@ -72,6 +78,7 @@
     border-right: 1px solid #E0E0E0;
     border-top: 1px solid #E0E0E0;
     transition: width .4s;
+    height: 90vh;
 }
 
 .dashboard{
@@ -86,5 +93,16 @@
 
 .navbar_hover:hover{
     background-color: rgba(0, 0, 0, 0.04);
+    cursor: pointer;
+}
+
+.icon_add{
+    background-color: #1876D1;
+    padding: 8px;
+    border-radius: 360px;
+    color: white;
+}
+
+.icon_add :hover{
     cursor: pointer;
 }

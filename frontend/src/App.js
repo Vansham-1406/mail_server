@@ -4,6 +4,10 @@ import Home from './home'
 import Signup from './Signup'
 import Login from './login'
 import Main from './Main'
+import Saved from './saved'
+import Deleted from './Deleted'
+import Profile from './Profile'
+import Sent from './Sent'
 
 const App = () => {
   return (
@@ -13,6 +17,10 @@ const App = () => {
             <Route path='/login' element={<Login/>}></Route>
             <Route path='/signup' element={<Signup/>}></Route>
             <Route path='/home' element={<Main/>}></Route>
+            <Route path='/profile' element={<Profile/>}></Route>
+            <Route path='/saved' element={<Saved/>}></Route>
+            <Route path='/deleted' element={<Deleted/>}></Route>
+            <Route path="/sent" element={<Sent/>}></Route>
         </Routes>
     </div>
   )

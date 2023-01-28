@@ -16,7 +16,7 @@ import MarkEmailReadIcon from '@mui/icons-material/MarkEmailRead';
 import "../node_modules/bootstrap/dist/css/bootstrap.css";
 import "./App.css";
 import axios from "axios";
-import Temp from "./temp";
+import Temp from './temp'
 
 const style = {
   position: "absolute",
@@ -29,7 +29,7 @@ const style = {
   p: 4,
 };
 
-const Main = () => {
+const Sent = () => {
   const [nav, setNav] = useState(true);
   const navigate = useNavigate();
   const [mess, setMess] = useState([])
@@ -266,7 +266,7 @@ const Main = () => {
                 </div>
               </div>
             </div>
-            <div className={nav ? "dashboard" : "dashboard1"}>Home Page</div>
+            <div className={nav ? "dashboard" : "dashboard1"}>Sent Page</div>
           </div>
         </div>
       ) : (
@@ -278,4 +278,4 @@ const Main = () => {
   );
 };
 
-export default Main;
+export default Sent

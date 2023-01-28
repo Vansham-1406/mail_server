@@ -103,3 +103,15 @@ exports.setUp = async (req,res) =>
     return res.status(400).json({msg:"failed",error : error})
   }
 }
+
+exports.getUser = async (req,res) => {
+  try 
+  {
+    const login = await User.findById(req.query.id);
+
+    console.log(login)
+  } 
+  catch (error) {
+    
+  }
+}
