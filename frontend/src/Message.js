@@ -10,6 +10,8 @@ import HomeIcon from "@mui/icons-material/Home";
 import AccountBoxIcon from "@mui/icons-material/AccountBox";
 import StarRateIcon from "@mui/icons-material/StarRate";
 import DeleteIcon from "@mui/icons-material/Delete";
+import IconButton from "@mui/material/IconButton";
+import Tooltip from "@mui/material/Tooltip";
 import AddIcon from "@mui/icons-material/Add";
 import TextareaAutosize from "@mui/base/TextareaAutosize";
 import MarkEmailReadIcon from "@mui/icons-material/MarkEmailRead";
@@ -17,14 +19,9 @@ import "../node_modules/bootstrap/dist/css/bootstrap.css";
 import "./App.css";
 import axios from "axios";
 import Temp from "./temp";
-
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
+import Card from "@mui/material/Card";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import PrintIcon from "@mui/icons-material/Print";
 
 const style = {
   position: "absolute",
@@ -37,11 +34,11 @@ const style = {
   p: 4,
 };
 
-const Main = () => {
+const Message = () => {
   const [nav, setNav] = useState(true);
   const navigate = useNavigate();
-  const [items, setItems] = useState([]);
   const [mess, setMess] = useState([]);
+  const [items, setItems] = useState([]);
 
   useEffect(() => {
     const items = JSON.parse(localStorage.getItem("userData"));
@@ -54,23 +51,17 @@ const Main = () => {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const api = () => {
+  useEffect(() => {
     axios
-      .get(`http://localhost:8450/message/getData`, {
-        params: { id: items.username },
-      })
+      .get(`http://localhost:8450/message/getData?id=${items?.username}`)
       .then((response) => {
         setMess(response.data.response);
       })
       .catch((error) => {
         console.log(error);
       });
-  };
-
-  useEffect(() => {
-    api();
-    // eslint-disable-next-line
-  }, [items.username]);
+  }, [items]);
+  console.log(mess);
 
   var today = new Date();
   const [messageDetails, setMessageDetails] = useState({
@@ -95,6 +86,7 @@ const Main = () => {
           alert("Message sent");
           handleClose();
         }
+        // console.log(response);
       })
       .catch((error) => {
         console.log(error);
@@ -281,176 +273,51 @@ const Main = () => {
             </div>
             <div className={nav ? "dashboard" : "dashboard1"}>
               <div className="container mt-5">
-                <TableContainer component={Paper}>
-                  <Table sx={{ minWidth: 650 }} aria-label="simple table">
-                    <TableHead>
-                      <TableRow>
-                        <TableCell className="fw-bold">From</TableCell>
-                        <TableCell align="right" className="fw-bold">
-                          Subject
-                        </TableCell>
-                        <TableCell align="center" className="fw-bold">
-                          Body
-                        </TableCell>
-                        <TableCell align="right" className="fw-bold">
-                          Saved
-                        </TableCell>
-                        <TableCell align="right" className="fw-bold">
-                          Deleted
-                        </TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {mess.map(
-                        (item) =>
-                          item &&
-                          item.Deleted === false && (
-                            <TableRow
-                              key={item?.id}
-                            >
-                              <TableCell
-                                component="th"
-                                scope="row"
-                                className={
-                                  item?.Opened === false
-                                    ? "fw-bold"
-                                    : "fw-light"
-                                }
-                                onMouseOver={(e)=>{e.target.style.cursor = "pointer"}}
-                                onClick={() => {
-                                  axios
-                                    .put(
-                                      `http://localhost:8450/message/checkOpened`,
-                                      item
-                                    )
-                                    .then((response) => {
-                                      api();
-                                      navigate(`message/${item._id}`)
-                                    })
-                                    .catch((error) => {
-                                      console.log(error);
-                                    });
-                                }}
-                              >
-                                {item?.From}
-                              </TableCell>
-                              <TableCell
-                                align="right"
-                                className={
-                                  item?.Opened === false
-                                    ? "fw-bold"
-                                    : "fw-light"
-                                }
-                                onMouseOver={(e)=>{e.target.style.cursor = "pointer"}}
-                                onClick={() => {
-                                  axios
-                                    .put(
-                                      `http://localhost:8450/message/checkOpened`,
-                                      item
-                                    )
-                                    .then((response) => {
-                                      api();
-                                      navigate(`message/${item._id}`)
-                                    })
-                                    .catch((error) => {
-                                      console.log(error);
-                                    });
-                                }}
-                              >
-                                {item?.Subject}
-                              </TableCell>
-                              <TableCell
-                                align="center"
-                                className={
-                                  item?.Opened === false
-                                  ? "fw-bold"
-                                  : "fw-light"
-                                }
-                                onMouseOver={(e)=>{e.target.style.cursor = "pointer"}}
-                                onClick={() => {
-                                  axios
-                                    .put(
-                                      `http://localhost:8450/message/checkOpened`,
-                                      item
-                                    )
-                                    .then((response) => {
-                                      api();
-                                      navigate(`message/${item._id}`)
-                                    })
-                                    .catch((error) => {
-                                      console.log(error);
-                                    });
-                                }}
-                              >
-                                {item?.Body}
-                              </TableCell>
-
-                              <TableCell align="right">
-                                {item?.Saved === true ? (
-                                  <StarRateIcon
-                                    style={{ color: "gold" }}
-                                    className="fs-1 cursor_pointer"
-                                    onClick={() => {
-                                      axios
-                                        .put(
-                                          `http://localhost:8450/message/checkSaveTrue`,
-                                          item
-                                        )
-                                        .then((response) => {
-                                          api();
-                                        })
-                                        .catch((error) => {
-                                          console.log(error);
-                                        });
-                                    }}
-                                  />
-                                ) : (
-                                  <StarRateIcon
-                                    style={{ color: "gray" }}
-                                    className="fs-1 cursor_pointer"
-                                    onClick={() => {
-                                      axios
-                                        .put(
-                                          "http://localhost:8450/message/checkSave",
-                                          item
-                                        )
-                                        .then((response) => {
-                                          api();
-                                        })
-                                        .catch((error) => {
-                                          console.log(error);
-                                        });
-                                    }}
-                                  />
-                                )}
-                              </TableCell>
-                              <TableCell align="right">
-                                {item?.Deleted === false && (
-                                  <DeleteIcon
-                                    style={{ color: "gray" }}
-                                    className="fs-1 cursor_pointer"
-                                    onClick={() => {
-                                      axios
-                                        .put(
-                                          "http://localhost:8450/message/checkDel2",
-                                          item
-                                        )
-                                        .then((response) => {
-                                          api();
-                                        })
-                                        .catch((error) => {
-                                          console.log(error);
-                                        });
-                                    }}
-                                  />
-                                )}
-                              </TableCell>
-                            </TableRow>
-                          )
-                      )}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
+                <div>
+                  <div>
+                    <Card sx={{ maxWidth: "100%", minWidth: 300 }}>
+                      <div className="d-flex m-3 ms-4 me-4 justify-content-between">
+                        <div>
+                          <Tooltip title="Previous">
+                            <IconButton>
+                              <ArrowBackIcon className="fs-3" />
+                            </IconButton>
+                          </Tooltip>
+                        </div>
+                        <div>
+                          <Tooltip title="Save">
+                            <IconButton>
+                              <StarRateIcon className="fs-3" />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title="Delete">
+                            <IconButton>
+                              <DeleteIcon className="fs-3" />
+                            </IconButton>
+                          </Tooltip>
+                        </div>
+                        <div>
+                          <Tooltip title="Print">
+                            <IconButton>
+                              <PrintIcon className="fs-3" />
+                            </IconButton>
+                          </Tooltip>
+                        </div>
+                      </div>
+                    </Card>
+                  </div>
+                  <div className="mt-5">
+                    <Card sx={{ maxWidth: 700, minWidth: 300 }}>
+                      <div className="d-flex flex-column mt-4 mb-4 ps-3">
+                        <h4 className="mb-4">From : Vansham Aggarwal</h4>
+                        <h4 className="mb-4">To : Muskan Aggarwal</h4>
+                        <h5 className="mb-4">Time : 10:00pm 12/01/2022</h5>
+                        <h4 className="mb-4">Subject : Hello World</h4>
+                        <h4 className="mb-4">Body : Hello World</h4>
+                      </div>
+                    </Card>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -464,4 +331,4 @@ const Main = () => {
   );
 };
 
-export default Main;
+export default Message;

@@ -1,13 +1,13 @@
 import React from 'react'
 import "../node_modules/bootstrap/dist/css/bootstrap.css";
 import "./App.css";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 
 const Temp = () => {
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
   return (
     <div>
-        <div className="main_banner">
+        {/* <div className="main_banner">
           <div className="position-absolute top-50 start-50 translate-middle d-flex flex-column text-dark text-center">
             <p className="fs-2 fw-bold">Welcome to Mail Server!</p>
             <p className="fs-2">Login/Sigup to send mails freely!</p>
@@ -30,7 +30,7 @@ const Temp = () => {
               </button>
             </div>
           </div>
-        </div>
+        </div> */}
     </div>
   )
 }

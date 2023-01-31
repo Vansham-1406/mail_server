@@ -21,8 +21,8 @@ exports.addMessage = async (req,res) => {
 }
 
 exports.getMessage = async (req,res) => {
-    console.log(req.query.id)
-    
+    // console.log(req.query.id)
+    console.log(req.body)
     try 
     {
         const Mess = await Message.find({To : req.query.id})
@@ -38,5 +38,69 @@ exports.getMessage = async (req,res) => {
     catch (error) 
     {
         return res.status(400).json({msg : error,status : false})
+    }
+}
+
+exports.checkSave = async (req,res) => {
+    console.log('1',req.body)
+    try 
+    {
+        const messUpdate = await Message.findByIdAndUpdate(req.body._id,{...req.body,Saved : true}) 
+        return res.status(204).json({msg : messUpdate, status : true})   
+    } 
+    catch (error) 
+    {
+        return res.status(401).json({msg : error, status : false})
+    }
+}
+
+exports.checkSave1 = async (req,res) => {
+    try 
+    {
+        const messUpdate = await Message.findByIdAndUpdate(req.body._id,{...req.body,Saved : false}) 
+        return res.status(204).json({msg : messUpdate, status : false})   
+    } 
+    catch (error) 
+    {
+        return res.status(401).json({msg : error, status : false})
+    }
+}
+
+exports.checkDel1 = async (req,res) => {
+    try 
+    {
+        const messUpdate = await Message.findByIdAndUpdate(req.body._id,{...req.body,Deleted : false}) 
+        console.log('2',messUpdate)
+        return res.status(204).json({msg : messUpdate, status : false})   
+    } 
+    catch (error) 
+    {
+        return res.status(401).json({msg : error, status : false})
+    }
+}
+
+exports.checkDel2 = async (req,res) => {
+    try 
+    {
+        const messUpdate = await Message.findByIdAndUpdate(req.body._id,{...req.body,Deleted : true}) 
+        console.log('2',messUpdate)
+        return res.status(204).json({msg : messUpdate, status : false})   
+    } 
+    catch (error) 
+    {
+        return res.status(401).json({msg : error, status : false})
+    }
+}
+
+exports.checkOpened = async (req,res) => {
+    try 
+    {
+        const messUpdate = await Message.findByIdAndUpdate(req.body._id,{...req.body,Opened : true}) 
+        console.log('2',messUpdate)
+        return res.status(204).json({msg : messUpdate, status : false})   
+    } 
+    catch (error) 
+    {
+        return res.status(401).json({msg : error, status : false})
     }
 }

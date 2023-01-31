@@ -8,6 +8,7 @@ import Saved from './saved'
 import Deleted from './Deleted'
 import Profile from './Profile'
 import Sent from './Sent'
+import Message from './Message'
 
 const App = () => {
   return (
@@ -21,6 +22,7 @@ const App = () => {
             <Route path='/saved' element={<Saved/>}></Route>
             <Route path='/deleted' element={<Deleted/>}></Route>
             <Route path="/sent" element={<Sent/>}></Route>
+            <Route path="/home/message/:id" element={<Message/>}></Route>
         </Routes>
     </div>
   )

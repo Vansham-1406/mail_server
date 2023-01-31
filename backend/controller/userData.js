@@ -81,7 +81,6 @@ exports.setUp = async (req,res) =>
   {
     const user = req.body;
     const login = await User.findOne({mobileNum : user.mobile})
-    console.log(login)
     if(login)
     {
       const hashPass = bcrypt.hashSync(user.password, 10);
