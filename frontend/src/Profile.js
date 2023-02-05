@@ -12,11 +12,27 @@ import StarRateIcon from "@mui/icons-material/StarRate";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import TextareaAutosize from "@mui/base/TextareaAutosize";
-import MarkEmailReadIcon from '@mui/icons-material/MarkEmailRead';
+import MarkEmailReadIcon from "@mui/icons-material/MarkEmailRead";
 import "../node_modules/bootstrap/dist/css/bootstrap.css";
 import "./App.css";
 import axios from "axios";
-import Temp from './temp'
+import Temp from "./temp";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
+import Grid from "@mui/material/Grid";
+import Alert from "@mui/material/Alert";
+import InputAdornment from "@mui/material/InputAdornment";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import IconButton from "@mui/material/IconButton";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import OutlinedInput from "@mui/material/OutlinedInput";
 
 const style = {
   position: "absolute",
@@ -32,7 +48,8 @@ const style = {
 const Profile = () => {
   const [nav, setNav] = useState(true);
   const navigate = useNavigate();
-  const [mess, setMess] = useState([])
+  // eslint-disable-next-line
+  const [mess, setMess] = useState([]);
   const [items, setItems] = useState([]);
 
   useEffect(() => {
@@ -46,23 +63,41 @@ const Profile = () => {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
+  const [open1, setOpen1] = useState(false);
+  const handleOpen1 = () => setOpen1(true);
+  const handleClose1 = () => setOpen1(false);
+
+  const [user, setUser] = useState({
+    mobile: "",
+    password: "",
+  });
+  const [otp, setOtp] = useState();
+  const [mainOtp, setmainOtp] = useState();
+  const [otpChecker, setOtpChecker] = useState({
+    validateMobile: true,
+    otpSent: false,
+    changePass: false,
+  });
+
+  const [values, setValues] = useState({
+    username: "",
+    password: "",
+  });
+
   useEffect(() => {
     axios
       .get(`http://localhost:8450/message/getData?id=${items?.username}`)
-      .then((response) => 
-      {
-        setMess(response.data.response)
+      .then((response) => {
+        setMess(response.data.response);
       })
       .catch((error) => {
         console.log(error);
       });
-    }, [items]);
-    console.log(mess)
-    
-    
+  }, [items]);
+
   var today = new Date();
   const [messageDetails, setMessageDetails] = useState({
-    From : "",
+    From: "",
     To: "",
     Time: today,
     Saved: false,
@@ -74,20 +109,69 @@ const Profile = () => {
 
   const sendMessage = () => {
     axios
-      .post("http://localhost:8450/message/data", {...messageDetails,From : items?.username})
+      .post("http://localhost:8450/message/data", {
+        ...messageDetails,
+        From: items?.username,
+      })
       .then((response) => {
-        if(response.data.msg === true)
-        {
+        if (response.data.msg === true) {
           alert("Message sent");
           handleClose();
         }
-        // console.log(response);
       })
       .catch((error) => {
         console.log(error);
       });
   };
 
+  const handleClickShowPassword = () => {
+    setValues({
+      ...values,
+      showPassword: !values.showPassword,
+    });
+  };
+
+  const handleMouseDownPassword = (event) => {
+    event.preventDefault();
+  };
+
+  const sendMobile = () => {
+    axios
+      .post("http://localhost:8450/otpLogin", {
+        number: items?.mobileNum,
+      })
+      .then((res) => {
+        setOtp(res.data.otp);
+        setOtpChecker({ validateMobile: false, otpSent: true });
+      })
+      .catch((err) => {
+        alert(`${err.response.data.msg}`);
+      });
+  };
+
+  const checkOtp = () => {
+    if (mainOtp === otp) {
+      setOtpChecker({
+        validateMobile: false,
+        otpSent: false,
+        changePass: true,
+      });
+    } else {
+      alert("Please enter correct OTP");
+    }
+  };
+
+  const changePassword = () => {
+    axios
+      .put("http://localhost:8450/user/setup", user)
+      .then((response) => {
+        alert("Password changed successfully");
+        handleClose1();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
   return (
     <div>
       {items?.firstName ? (
@@ -266,16 +350,192 @@ const Profile = () => {
                 </div>
               </div>
             </div>
-            <div className={nav ? "dashboard" : "dashboard1"}>Profile Page</div>
+            <div className={nav ? "dashboard" : "dashboard1"}>
+              <TableContainer
+                component={Paper}
+                sx={{ maxWidth: 650 }}
+                className="mt-5 ms-5"
+              >
+                <Table aria-label="simple table">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>
+                        <b>First Name</b>
+                      </TableCell>
+                      <TableCell align="right">{items?.firstName}</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>
+                        <b>Last Name</b>
+                      </TableCell>
+                      <TableCell align="right">{items?.lastName}</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell component="th" scope="row">
+                        <b>Username</b>
+                      </TableCell>
+                      <TableCell align="right">{items?.username}</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell component="th" scope="row">
+                        <b>Mobile Number</b>
+                      </TableCell>
+                      <TableCell align="right">{items?.mobileNum}</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell component="th" scope="row">
+                        <b>Password</b>
+                      </TableCell>
+                      <TableCell align="right" onClick={handleOpen1} style={{cursor:"pointer"}} >
+                        Change Password?
+                      </TableCell>
+                      <Modal
+                        open={open1}
+                        onClose={handleClose1}
+                        aria-labelledby="modal-modal-title"
+                        aria-describedby="modal-modal-description"
+                      >
+                        <Box
+                          sx={style}
+                          className="d-flex justify-content-center flex-column align-items-center"
+                        >
+                          <Grid className="d-flex justify-content-center align-items-center flex-column">
+                            {/* TO SEND OTP  */}
+                            {otpChecker.validateMobile && (
+                              <div>
+                                <h4 className=" mb-4">Account Recovery</h4>
+                                <TextField
+                                  style={{ width: "350px" }}
+                                  label="Mobile Number"
+                                  id="outlined-start-adornment"
+                                  name="mobile"
+                                  autoComplete="mobile"
+                                  InputProps={{
+                                    startAdornment: (
+                                      <InputAdornment position="start">
+                                        +91
+                                      </InputAdornment>
+                                    ),
+                                  }}
+                                  value={parseInt(items.mobileNum)}
+                                  
+                                  readOnly
+                                />
+                                <Button
+                                  variant="contained"
+                                  style={{ width: "150px" }}
+                                  className="mt-4"
+                                  onClick={sendMobile}
+                                  
+                                >
+                                  SEND OTP
+                                </Button>
+                              </div>
+                            )}
+
+                            {/* TO CHECK OTP  */}
+                            {otpChecker.otpSent && (
+                              <div>
+                                <h4 className="fw-bold">Enter OTP recieved</h4>
+                                <div className="d-flex justify-content-between mt-4">
+                                  <TextField
+                                    label="OTP"
+                                    InputLabelProps={{
+                                      shrink: true,
+                                    }}
+                                    variant="standard"
+                                    onChange={(e) => {
+                                      setmainOtp(parseInt(e.target.value));
+                                    }}
+                                  />
+                                </div>
+                                <Button
+                                  variant="contained"
+                                  className="mt-4"
+                                  onClick={checkOtp}
+                                >
+                                  VERIFY
+                                </Button>
+                              </div>
+                            )}
+
+                            {/* CHANGE PASSWORD  */}
+                            {otpChecker.changePass && (
+                              <div>
+                                <Alert severity="success">OTP VERIFIED!</Alert>
+                                <Grid className="d-flex flex-column">
+                                  <FormControl
+                                    variant="outlined"
+                                    style={{ width: "350px" }}
+                                    className="mt-4"
+                                  >
+                                    <InputLabel htmlFor="outlined-adornment-password">
+                                      Password
+                                    </InputLabel>
+                                    <OutlinedInput
+                                      id="outlined-adornment-password"
+                                      type={
+                                        values.showPassword
+                                          ? "text"
+                                          : "password"
+                                      }
+                                      value={user.password}
+                                      onChange={(e) => {
+                                        setUser({
+                                          ...user,
+                                          password: e.target.value,
+                                        });
+                                      }}
+                                      endAdornment={
+                                        <InputAdornment position="end">
+                                          <IconButton
+                                            aria-label="toggle password visibility"
+                                            onClick={handleClickShowPassword}
+                                            onMouseDown={
+                                              handleMouseDownPassword
+                                            }
+                                            edge="end"
+                                          >
+                                            {values.showPassword ? (
+                                              <VisibilityOff />
+                                            ) : (
+                                              <Visibility />
+                                            )}
+                                          </IconButton>
+                                        </InputAdornment>
+                                      }
+                                      label="Password"
+                                    />
+                                  </FormControl>
+                                  <Button
+                                    variant="contained"
+                                    className="mt-4"
+                                    onClick={changePassword}
+                                  >
+                                    Change Password
+                                  </Button>
+                                </Grid>
+                              </div>
+                            )}
+                          </Grid>
+                        </Box>
+                      </Modal>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </div>
           </div>
         </div>
       ) : (
         <div>
-          <Temp/>
+          <Temp />
         </div>
       )}
     </div>
   );
 };
 
-export default Profile
+export default Profile;

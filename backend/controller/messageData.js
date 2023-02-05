@@ -104,3 +104,64 @@ exports.checkOpened = async (req,res) => {
         return res.status(401).json({msg : error, status : false})
     }
 }
+
+exports.checkMessage = async (req,res) => {
+    try 
+    {
+        const accept = await Message.findById(req.query.id)
+    
+        if(accept)
+        {
+            return res.status(200).json({status : true, response : accept})
+        }
+        else
+        {
+            return res.status(401).json({status : false, response : "Message not found"})
+        }
+    } 
+    catch (error) 
+    {
+        return res.status(401).json({status : false, response : error || "Message not found"})
+    }
+}
+
+exports.removeMess = async (req,res) => {
+    console.log(req.query.id)
+    try 
+    {
+        const msg = await Message.findByIdAndDelete(req.query.id)
+
+        if(msg)
+        {
+            return res.status(204).send({msg : msg, status : true})
+        }
+        else
+        {
+            return res.status(400).json({status : false, msg : "Message not deleted"})
+        }
+    } 
+    catch (error) 
+    {
+        return res.status(400).json({status : false, msg : "Message not deleted"})
+    }
+}
+
+exports.sentData = async (req,res) => {
+    console.log(req.body)
+    try 
+    {
+        const Mess = await Message.find({From : req.query.id})
+        if(Mess)
+        {
+            return res.status(200).send({ msg: "user", response: Mess });
+        }
+        else
+        {
+            return res.status(400).json({msg : "Failed",status : false})
+        }
+    } 
+    catch (error) 
+    {
+        return res.status(400).json({msg : error,status : false})
+    }
+}

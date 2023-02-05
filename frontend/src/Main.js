@@ -42,11 +42,13 @@ const Main = () => {
   const navigate = useNavigate();
   const [items, setItems] = useState([]);
   const [mess, setMess] = useState([]);
+  const [dt, setDt] = useState(false);
 
   useEffect(() => {
     const items = JSON.parse(localStorage.getItem("userData"));
     if (items) {
       setItems(items);
+      setDt(true);
     }
   }, []);
 
@@ -55,22 +57,28 @@ const Main = () => {
   const handleClose = () => setOpen(false);
 
   const api = () => {
+    if (dt === false && items.username === undefined) 
+    {}
+    else
+    {
     axios
       .get(`http://localhost:8450/message/getData`, {
-        params: { id: items.username },
+        params: { id: items?.username },
       })
       .then((response) => {
-        setMess(response.data.response);
+        setMess(response?.data?.response);
       })
       .catch((error) => {
         console.log(error);
       });
+    }
   };
 
   useEffect(() => {
-    api();
+    
+      api();
     // eslint-disable-next-line
-  }, [items.username]);
+  }, [items?.username, mess.length > 0]);
 
   var today = new Date();
   const [messageDetails, setMessageDetails] = useState({
@@ -91,7 +99,7 @@ const Main = () => {
         From: items?.username,
       })
       .then((response) => {
-        if (response.data.msg === true) {
+        if (response?.data?.msg === true) {
           alert("Message sent");
           handleClose();
         }
@@ -217,7 +225,6 @@ const Main = () => {
                 <div className="icon_add">
                   <AddIcon onClick={handleOpen} />
                   <Modal
-                    keepMounted
                     open={open}
                     onClose={handleClose}
                     aria-labelledby="modal-modal-title"
@@ -305,9 +312,7 @@ const Main = () => {
                         (item) =>
                           item &&
                           item.Deleted === false && (
-                            <TableRow
-                              key={item?.id}
-                            >
+                            <TableRow key={item?.id}>
                               <TableCell
                                 component="th"
                                 scope="row"
@@ -316,7 +321,9 @@ const Main = () => {
                                     ? "fw-bold"
                                     : "fw-light"
                                 }
-                                onMouseOver={(e)=>{e.target.style.cursor = "pointer"}}
+                                onMouseOver={(e) => {
+                                  e.target.style.cursor = "pointer";
+                                }}
                                 onClick={() => {
                                   axios
                                     .put(
@@ -325,7 +332,7 @@ const Main = () => {
                                     )
                                     .then((response) => {
                                       api();
-                                      navigate(`message/${item._id}`)
+                                      navigate(`message/${item._id}`);
                                     })
                                     .catch((error) => {
                                       console.log(error);
@@ -341,7 +348,9 @@ const Main = () => {
                                     ? "fw-bold"
                                     : "fw-light"
                                 }
-                                onMouseOver={(e)=>{e.target.style.cursor = "pointer"}}
+                                onMouseOver={(e) => {
+                                  e.target.style.cursor = "pointer";
+                                }}
                                 onClick={() => {
                                   axios
                                     .put(
@@ -350,7 +359,7 @@ const Main = () => {
                                     )
                                     .then((response) => {
                                       api();
-                                      navigate(`message/${item._id}`)
+                                      navigate(`/message/${item._id}`);
                                     })
                                     .catch((error) => {
                                       console.log(error);
@@ -363,10 +372,12 @@ const Main = () => {
                                 align="center"
                                 className={
                                   item?.Opened === false
-                                  ? "fw-bold"
-                                  : "fw-light"
+                                    ? "fw-bold"
+                                    : "fw-light"
                                 }
-                                onMouseOver={(e)=>{e.target.style.cursor = "pointer"}}
+                                onMouseOver={(e) => {
+                                  e.target.style.cursor = "pointer";
+                                }}
                                 onClick={() => {
                                   axios
                                     .put(
@@ -375,7 +386,7 @@ const Main = () => {
                                     )
                                     .then((response) => {
                                       api();
-                                      navigate(`message/${item._id}`)
+                                      navigate(`message/${item._id}`);
                                     })
                                     .catch((error) => {
                                       console.log(error);

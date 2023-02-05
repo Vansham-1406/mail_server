@@ -22,7 +22,8 @@ import Temp from "./temp";
 import Card from "@mui/material/Card";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import PrintIcon from "@mui/icons-material/Print";
-
+import { useParams } from "react-router-dom";
+import moment from "moment";
 const style = {
   position: "absolute",
   top: "50%",
@@ -37,7 +38,7 @@ const style = {
 const Message = () => {
   const [nav, setNav] = useState(true);
   const navigate = useNavigate();
-  const [mess, setMess] = useState([]);
+  const [singleMess, setSingleMess] = useState({});
   const [items, setItems] = useState([]);
 
   useEffect(() => {
@@ -51,17 +52,27 @@ const Message = () => {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  useEffect(() => {
+  const params = useParams();
+  console.log('params',params)
+
+  const api = () => {
     axios
-      .get(`http://localhost:8450/message/getData?id=${items?.username}`)
+      .get(`http://localhost:8450/message/getMessage`, {
+        params: {
+          id: params?.id,
+        },
+      })
       .then((response) => {
-        setMess(response.data.response);
+        setSingleMess(response.data.response);
       })
       .catch((error) => {
         console.log(error);
       });
-  }, [items]);
-  console.log(mess);
+  };
+  useEffect(() => {
+    api();
+    // eslint-disable-next-line
+  }, [params.id]);
 
   var today = new Date();
   const [messageDetails, setMessageDetails] = useState({
@@ -86,13 +97,11 @@ const Message = () => {
           alert("Message sent");
           handleClose();
         }
-        // console.log(response);
       })
       .catch((error) => {
         console.log(error);
       });
   };
-
   return (
     <div>
       {items?.firstName ? (
@@ -209,7 +218,6 @@ const Message = () => {
                 <div className="icon_add">
                   <AddIcon onClick={handleOpen} />
                   <Modal
-                    keepMounted
                     open={open}
                     onClose={handleClose}
                     aria-labelledby="modal-modal-title"
@@ -278,7 +286,12 @@ const Message = () => {
                     <Card sx={{ maxWidth: "100%", minWidth: 300 }}>
                       <div className="d-flex m-3 ms-4 me-4 justify-content-between">
                         <div>
-                          <Tooltip title="Previous">
+                          <Tooltip
+                            title="Previous"
+                            onClick={() => {
+                              navigate(-1);
+                            }}
+                          >
                             <IconButton>
                               <ArrowBackIcon className="fs-3" />
                             </IconButton>
@@ -287,17 +300,95 @@ const Message = () => {
                         <div>
                           <Tooltip title="Save">
                             <IconButton>
-                              <StarRateIcon className="fs-3" />
+                              {singleMess?.Saved === true ? (
+                                <StarRateIcon
+                                  style={{ color: "gold" }}
+                                  className="fs-1 cursor_pointer"
+                                  onClick={() => {
+                                    axios
+                                      .put(
+                                        `http://localhost:8450/message/checkSaveTrue`,
+                                        singleMess
+                                      )
+                                      .then((response) => {
+                                        api();
+                                      })
+                                      .catch((error) => {
+                                        console.log(error);
+                                      });
+                                  }}
+                                />
+                              ) : (
+                                <StarRateIcon
+                                  style={{ color: "gray" }}
+                                  className="fs-1 cursor_pointer"
+                                  onClick={() => {
+                                    axios
+                                      .put(
+                                        "http://localhost:8450/message/checkSave",
+                                        singleMess
+                                      )
+                                      .then((response) => {
+                                        api();
+                                      })
+                                      .catch((error) => {
+                                        console.log(error);
+                                      });
+                                  }}
+                                />
+                              )}
                             </IconButton>
                           </Tooltip>
                           <Tooltip title="Delete">
                             <IconButton>
-                              <DeleteIcon className="fs-3" />
+                              {singleMess?.Deleted === false ? (
+                                <DeleteIcon
+                                  style={{ color: "gray" }}
+                                  className="fs-1 cursor_pointer"
+                                  onClick={() => {
+                                    axios
+                                      .put(
+                                        "http://localhost:8450/message/checkDel2",
+                                        singleMess
+                                      )
+                                      .then((response) => {
+                                        api();
+                                      })
+                                      .catch((error) => {
+                                        console.log(error);
+                                      });
+                                  }}
+                                />
+                              ):
+                              (
+                                <DeleteIcon
+                                  style={{ color: "red" }}
+                                  className="fs-1 cursor_pointer"
+                                  onClick={() => {
+                                    axios
+                                      .put(
+                                        "http://localhost:8450/message/checkDel1",
+                                        singleMess
+                                      )
+                                      .then((response) => {
+                                        api();
+                                      })
+                                      .catch((error) => {
+                                        console.log(error);
+                                      });
+                                  }}
+                                />
+                              )}
                             </IconButton>
                           </Tooltip>
                         </div>
                         <div>
-                          <Tooltip title="Print">
+                          <Tooltip
+                            title="Print"
+                            onClick={() => {
+                              window.print();
+                            }}
+                          >
                             <IconButton>
                               <PrintIcon className="fs-3" />
                             </IconButton>
@@ -307,13 +398,38 @@ const Message = () => {
                     </Card>
                   </div>
                   <div className="mt-5">
-                    <Card sx={{ maxWidth: 700, minWidth: 300 }}>
+                    <Card sx={{ maxWidth: "60%", minWidth: 300 }}>
                       <div className="d-flex flex-column mt-4 mb-4 ps-3">
-                        <h4 className="mb-4">From : Vansham Aggarwal</h4>
-                        <h4 className="mb-4">To : Muskan Aggarwal</h4>
-                        <h5 className="mb-4">Time : 10:00pm 12/01/2022</h5>
-                        <h4 className="mb-4">Subject : Hello World</h4>
-                        <h4 className="mb-4">Body : Hello World</h4>
+                        <div className="d-flex justify-content-between pe-3">
+                          <h6 className="">
+                            From :{" "}
+                            <span className="fw-bold">{singleMess?.From}</span>
+                          </h6>
+                          <h6 className="mb-4">
+                            Date :{" "}
+                            <span className="fw-bold">
+                              {moment(singleMess?.Time).format("DD/MM/YYYY")}
+                            </span>
+                          </h6>
+                        </div>
+                        <div className="d-flex justify-content-between pe-3">
+                          <h6 className="mb-4">
+                            To :{" "}
+                            <span className="fw-bold">{singleMess?.To}</span>
+                          </h6>
+                          <h6 className="mb-4">
+                            Time :{" "}
+                            <span className="fw-bold">
+                              {moment(singleMess?.Time).format("HH:MM")}
+                            </span>
+                          </h6>
+                        </div>
+                        <h5 className="mb-4 mt-3">
+                          Subject - <b>{singleMess?.Subject}</b>
+                        </h5>
+                        <h4 className="mb-4" style={{ whiteSpace: "pre-line" }}>
+                          {singleMess?.Body}
+                        </h4>
                       </div>
                     </Card>
                   </div>

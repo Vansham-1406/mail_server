@@ -12,11 +12,19 @@ import StarRateIcon from "@mui/icons-material/StarRate";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import TextareaAutosize from "@mui/base/TextareaAutosize";
-import MarkEmailReadIcon from '@mui/icons-material/MarkEmailRead';
+import MarkEmailReadIcon from "@mui/icons-material/MarkEmailRead";
 import "../node_modules/bootstrap/dist/css/bootstrap.css";
 import "./App.css";
 import axios from "axios";
-import Temp from './temp'
+import Temp from "./temp";
+
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
 
 const style = {
   position: "absolute",
@@ -29,16 +37,18 @@ const style = {
   p: 4,
 };
 
-const Saved = () => {
+const Sav = () => {
   const [nav, setNav] = useState(true);
   const navigate = useNavigate();
-  const [mess, setMess] = useState([])
   const [items, setItems] = useState([]);
+  const [mess, setMess] = useState([]);
+  const [dt, setDt] = useState(false);
 
   useEffect(() => {
     const items = JSON.parse(localStorage.getItem("userData"));
     if (items) {
       setItems(items);
+      setDt(true);
     }
   }, []);
 
@@ -46,23 +56,31 @@ const Saved = () => {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
+  const api = () => {
+    if (dt === false && items.username === undefined) {
+    } else {
+      axios
+        .get(`http://localhost:8450/message/getData`, {
+          params: { id: items?.username },
+        })
+        .then((response) => {
+          setMess(response?.data?.response);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+  };
+
   useEffect(() => {
-    axios
-      .get(`http://localhost:8450/message/getData?id=${items?.username}`)
-      .then((response) => 
-      {
-        setMess(response.data.response)
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-    }, [items]);
-    console.log(mess)
-    
-    
+    api();
+    // eslint-disable-next-line
+  }, [items?.username, mess.length > 0]);
+
+
   var today = new Date();
   const [messageDetails, setMessageDetails] = useState({
-    From : "",
+    From: "",
     To: "",
     Time: today,
     Saved: false,
@@ -74,14 +92,15 @@ const Saved = () => {
 
   const sendMessage = () => {
     axios
-      .post("http://localhost:8450/message/data", {...messageDetails,From : items?.username})
+      .post("http://localhost:8450/message/data", {
+        ...messageDetails,
+        From: items?.username,
+      })
       .then((response) => {
-        if(response.data.msg === true)
-        {
+        if (response?.data?.msg === true) {
           alert("Message sent");
           handleClose();
         }
-        // console.log(response);
       })
       .catch((error) => {
         console.log(error);
@@ -204,7 +223,6 @@ const Saved = () => {
                 <div className="icon_add">
                   <AddIcon onClick={handleOpen} />
                   <Modal
-                    keepMounted
                     open={open}
                     onClose={handleClose}
                     aria-labelledby="modal-modal-title"
@@ -266,16 +284,207 @@ const Saved = () => {
                 </div>
               </div>
             </div>
-            <div className={nav ? "dashboard" : "dashboard1"}>Saved Page</div>
+            <div className={nav ? "dashboard" : "dashboard1"}>
+              {(
+                <div className="container mt-5">
+                  <TableContainer component={Paper}>
+                    <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                      <TableHead>
+                        <TableRow>
+                          <TableCell className="fw-bold">From</TableCell>
+                          <TableCell align="right" className="fw-bold">
+                            Subject
+                          </TableCell>
+                          <TableCell align="center" className="fw-bold">
+                            Body
+                          </TableCell>
+                          <TableCell align="right" className="fw-bold">
+                            Saved
+                          </TableCell>
+                          <TableCell align="right" className="fw-bold">
+                            Deleted
+                          </TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {mess.map(
+                          (item) =>
+                            item &&
+                            item.Saved === true &&
+                            item.Deleted === false && (
+                              <TableRow key={item?.id}>
+                                <TableCell
+                                  component="th"
+                                  scope="row"
+                                  className={
+                                    item?.Opened === false
+                                      ? "fw-bold"
+                                      : "fw-light"
+                                  }
+                                  onMouseOver={(e) => {
+                                    e.target.style.cursor = "pointer";
+                                  }}
+                                  onClick={() => {
+                                    axios
+                                      .put(
+                                        `http://localhost:8450/message/checkOpened`,
+                                        item
+                                      )
+                                      .then((response) => {
+                                        api();
+                                        navigate(`message/${item._id}`);
+                                      })
+                                      .catch((error) => {
+                                        console.log(error);
+                                      });
+                                  }}
+                                >
+                                  {item?.From}
+                                </TableCell>
+                                <TableCell
+                                  align="right"
+                                  className={
+                                    item?.Opened === false
+                                      ? "fw-bold"
+                                      : "fw-light"
+                                  }
+                                  onMouseOver={(e) => {
+                                    e.target.style.cursor = "pointer";
+                                  }}
+                                  onClick={() => {
+                                    axios
+                                      .put(
+                                        `http://localhost:8450/message/checkOpened`,
+                                        item
+                                      )
+                                      .then((response) => {
+                                        api();
+                                        navigate(`message/${item._id}`);
+                                      })
+                                      .catch((error) => {
+                                        console.log(error);
+                                      });
+                                  }}
+                                >
+                                  {item?.Subject}
+                                </TableCell>
+                                <TableCell
+                                  align="center"
+                                  className={
+                                    item?.Opened === false
+                                      ? "fw-bold"
+                                      : "fw-light"
+                                  }
+                                  onMouseOver={(e) => {
+                                    e.target.style.cursor = "pointer";
+                                  }}
+                                  onClick={() => {
+                                    axios
+                                      .put(
+                                        `http://localhost:8450/message/checkOpened`,
+                                        item
+                                      )
+                                      .then((response) => {
+                                        api();
+                                        navigate(`message/${item._id}`);
+                                      })
+                                      .catch((error) => {
+                                        console.log(error);
+                                      });
+                                  }}
+                                >
+                                  {item?.Body}
+                                </TableCell>
+
+                                <TableCell align="right">
+                                  {item?.Saved === true ? (
+                                    <StarRateIcon
+                                      style={{ color: "gold" }}
+                                      className="fs-1 cursor_pointer"
+                                      onClick={() => {
+                                        axios
+                                          .put(
+                                            `http://localhost:8450/message/checkSaveTrue`,
+                                            item
+                                          )
+                                          .then((response) => {
+                                            api();
+                                          })
+                                          .catch((error) => {
+                                            console.log(error);
+                                          });
+                                      }}
+                                    />
+                                  ) : (
+                                    <StarRateIcon
+                                      style={{ color: "gray" }}
+                                      className="fs-1 cursor_pointer"
+                                      onClick={() => {
+                                        axios
+                                          .put(
+                                            "http://localhost:8450/message/checkSave",
+                                            item
+                                          )
+                                          .then((response) => {
+                                            api();
+                                          })
+                                          .catch((error) => {
+                                            console.log(error);
+                                          });
+                                      }}
+                                    />
+                                  )}
+                                </TableCell>
+                                <TableCell align="right">
+                                  {item?.Deleted === false && (
+                                    <DeleteIcon
+                                      style={{ color: "gray" }}
+                                      className="fs-1 cursor_pointer"
+                                      onClick={() => {
+                                        axios
+                                          .put(
+                                            "http://localhost:8450/message/checkDel2",
+                                            item
+                                          )
+                                          .then((response) => {
+                                            api();
+                                          })
+                                          .catch((error) => {
+                                            console.log(error);
+                                          });
+                                      }}
+                                    />
+                                  )}
+                                </TableCell>
+                              </TableRow>
+                            )
+                        )}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </div>
+              // ) : (
+              //   <div className="ms-5 mt-5">
+              //     <img
+              //       src="mess.jpg"
+              //       className="img-fluid"
+              //       width="500px"
+              //       alt="No message"
+              //     />
+              //     <h1 className="fw-bold mt-4">No message found!</h1>
+              //   </div>
+              // )}
+                                    )}
+            </div>
           </div>
         </div>
       ) : (
         <div>
-          <Temp/>
+          <Temp />
         </div>
       )}
     </div>
   );
 };
 
-export default Saved
+export default Sav;

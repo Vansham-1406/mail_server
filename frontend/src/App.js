@@ -23,6 +23,9 @@ const App = () => {
             <Route path='/deleted' element={<Deleted/>}></Route>
             <Route path="/sent" element={<Sent/>}></Route>
             <Route path="/home/message/:id" element={<Message/>}></Route>
+            <Route path="/sent/message/:id" element={<Message/>}></Route>
+            <Route path="/saved/message/:id" element={<Message/>}></Route>
+            <Route path="/deleted/message/:id" element={<Message/>}></Route>
         </Routes>
     </div>
   )

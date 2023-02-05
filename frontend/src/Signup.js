@@ -47,8 +47,6 @@ const Signup = () => {
   };
 
   const [disableNum, setDisableNum] = useState(false)
-  console.log(checkOtp);
-  console.log(otp)
 
   const checkPass = () => {
     if(values.OTP === otp)
@@ -71,7 +69,6 @@ const Signup = () => {
           number : values.mobileNum
         })
         .then((res)=>{
-          console.log(res)
           setOtp(res.data.otp)
           setCheckOtp({statement : true,name:"Verify OTP"});
           

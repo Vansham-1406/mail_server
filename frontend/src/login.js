@@ -86,7 +86,6 @@ const Login = () => {
             number: user.mobile,
           })
           .then((res) => {
-            console.log(res);
             setOtp(res.data.otp);
             setOtpChecker({ validateMobile: false, otpSent: true });
           })
