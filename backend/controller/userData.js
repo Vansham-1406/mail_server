@@ -2,7 +2,7 @@ const User = require("../model/userModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken")
 
-const secretKey = "Vansham_MailServer"
+
 exports.userRegister = async (req, res) => {
   try {
     const newU = req.body.values;
@@ -44,7 +44,7 @@ exports.userLogin = async (req, res) => {
     {
       const checkPass = bcrypt.compareSync(password, user.password);
   
-      const token = await jwt.sign({user},secretKey,{expiresIn:"300s"})
+      const token = await jwt.sign({user},process.env.secretKey,{expiresIn:"300s"})
       if (checkPass) 
       {
         res.status(200).json({

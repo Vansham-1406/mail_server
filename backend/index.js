@@ -8,9 +8,10 @@ const messageData = require("./route/messageData")
 
 app.use(cors())
 app.use(express.json({limit:'50mb'}))
+require('dotenv').config()
 
 mongoose.set("strictQuery", false)
-mongoose.connect("mongodb+srv://vansham:vansham@cluster0.nzikjdl.mongodb.net/mail?retryWrites=true&w=majority",
+mongoose.connect(process.env.MONGOOSE,
 function (err) 
 {
     if (err) throw err;

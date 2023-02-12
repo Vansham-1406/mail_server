@@ -74,8 +74,7 @@ const Main = () => {
     }
   };
 
-  useEffect(() => {
-    
+  useEffect(() => {    
       api();
     // eslint-disable-next-line
   }, [items?.username, mess.length > 0]);
