@@ -11,7 +11,7 @@ app.use(express.json({limit:'50mb'}))
 require('dotenv').config()
 
 mongoose.set("strictQuery", false)
-mongoose.connect(process.env.MONGOOSE,
+mongoose.connect("mongodb+srv://vansham:vansham@cluster0.nzikjdl.mongodb.net/mail?retryWrites=true&w=majority",
 function (err) 
 {
     if (err) throw err;
