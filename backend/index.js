@@ -9,9 +9,10 @@ const messageData = require("./route/messageData")
 app.use(cors())
 app.use(express.json({limit:'50mb'}))
 require('dotenv').config()
-
+var PORT = process.env.PORT
+var mongo = process.env.MONGOOSE
 mongoose.set("strictQuery", false)
-mongoose.connect("mongodb+srv://vansham:vansham@cluster0.nzikjdl.mongodb.net/mail?retryWrites=true&w=majority",
+mongoose.connect(mon,
 function (err) 
 {
     if (err) throw err;
@@ -23,6 +24,6 @@ app.use("/message",messageData)
 app.use("/user",userData)
 app.use("/",otpRoute)
 
-app.listen(8450,()=>{
+app.listen(PORT,()=>{
     console.log("Connected to port 8450")
 })
