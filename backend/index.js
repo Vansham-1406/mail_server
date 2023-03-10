@@ -9,10 +9,10 @@ const messageData = require("./route/messageData")
 app.use(cors())
 app.use(express.json({limit:'50mb'}))
 require('dotenv').config()
-var PORT = process.env.PORT
+var PORT = process.env.PORT || 8450
 var mongo = process.env.MONGOOSE
 mongoose.set("strictQuery", false)
-mongoose.connect(mon,
+mongoose.connect(mongo,
 function (err) 
 {
     if (err) throw err;
