@@ -21,8 +21,6 @@ exports.addMessage = async (req,res) => {
 }
 
 exports.getMessage = async (req,res) => {
-    // console.log(req.query.id)
-    console.log(req.body)
     try 
     {
         const Mess = await Message.find({To : req.query.id})
@@ -42,7 +40,6 @@ exports.getMessage = async (req,res) => {
 }
 
 exports.checkSave = async (req,res) => {
-    console.log('1',req.body)
     try 
     {
         const messUpdate = await Message.findByIdAndUpdate(req.body._id,{...req.body,Saved : true}) 
