@@ -16,9 +16,9 @@ import IconButton from "@mui/material/IconButton";
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import OutlinedInput from "@mui/material/OutlinedInput";
-import VerifiedIcon from '@mui/icons-material/Verified';
-import axios from 'axios'
-import {useNavigate} from 'react-router-dom'
+import VerifiedIcon from "@mui/icons-material/Verified";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const Signup = () => {
   const theme = createTheme();
@@ -26,19 +26,19 @@ const Signup = () => {
   const [values, setValues] = useState({
     firstName: "",
     lastName: "",
-    mobileNum: "",
+    email: "",
     OTP: "",
     username: "",
     password: "",
     showPassword: false,
   });
 
-  const [otp, setOtp] = useState()
+  const [otp, setOtp] = useState();
   const [checkOtp, setCheckOtp] = useState({
-    statement : false,
-    name : "Send OTP",
-    state : false
-  })
+    statement: false,
+    name: "Send OTP",
+    state: false,
+  });
   const handleClickShowPassword = () => {
     setValues({
       ...values,
@@ -46,62 +46,55 @@ const Signup = () => {
     });
   };
 
-  const [disableNum, setDisableNum] = useState(false)
+  const [disableNum, setDisableNum] = useState(false);
 
   const checkPass = () => {
-    if(values.OTP === otp)
-    {
-        setCheckOtp({...checkOtp,state:true})
-        setDisableNum(true)
+    if (values.OTP === otp) {
+      setCheckOtp({ ...checkOtp, state: true });
+      setDisableNum(true);
+    } else {
+      alert("Please enter correct OTP");
     }
-    else
-    {
-        alert("Please enter correct OTP");
-    }
-  }
+  };
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
   };
 
-    const sendSms = () => {
-        values.mobileNum && values.mobileNum.length === 10 ?
-        axios.post("http://localhost:8450/otpRegister",{
-          number : values.mobileNum
+  const sendSms = () => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (values.email && emailRegex.test(values.email)) {
+      axios
+        .post("http://localhost:8450/otpRegister", {
+          email: values.email,
         })
-        .then((res)=>{
-          setOtp(res.data.otp)
-          setCheckOtp({statement : true,name:"Verify OTP"});
-          
+        .then((res) => {
+          setOtp(res.data.otp);
+          setCheckOtp({ statement: true, name: "Verify OTP" });
         })
-        .catch((err)=>{
+        .catch((err) => {
           alert(`${err.response.data.msg}`);
-        })
-        :
-        alert("Enter Mobile number of 10 digits")
-      };
+        });
+    } else {
+      alert("Enter a valid email address");
+    }
+  };
 
-    const handleSubmit = () => {
-        checkOtp.state === true 
-        ?
-        axios.post("http://localhost:8450/user/signup",{
-            values
-        })
-        .then((res)=>{
-          alert("Registered Successfully, Now login!")
-          navigate("/login")
-        })
-        .catch((err)=>{
-            err.response.data.status.keyValue.mobileNum &&
-            alert(`Mobile Number : ${err.response.data.status.keyValue.mobileNum} already exist`)
-
-            err.response.data.status.keyValue.username &&
-            alert(`Username : ${err.response.data.status.keyValue.username} already exist`)    
-        })
-
-        :
-        alert("Please verify the number")
-    }  
-
+  const handleSubmit = () => {
+    checkOtp.state === true
+      ? axios
+          .post("http://localhost:8450/user/signup", {
+            values,
+          })
+          .then((res) => {
+            alert("Registered Successfully, Now login!");
+            navigate("/login");
+          })
+          .catch((err) => {
+            alert(`${err.response.data.msg}`);
+          })
+      : alert("Please verify the Email");
+  };
 
   return (
     <div>
@@ -148,36 +141,33 @@ const Signup = () => {
                 <Grid item xs={12} sm={8}>
                   <TextField
                     fullWidth
-                    label="Mobile Number"
+                    required
+                    label="Email"
                     id="outlined-start-adornment"
-                    name="mobile"
-                    autoComplete="mobile"
+                    name="email"
+                    autoComplete="email"
                     InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">+91</InputAdornment>
-                      ),
-                      maxLength: 10,
-                      minLength: 10,
-                      readOnly: disableNum === true ? true : false
+                      readOnly: disableNum === true ? true : false,
                     }}
                     onChange={(e) => {
-                      setValues({ ...values, mobileNum: e.target.value });
+                      setValues({ ...values, email: e.target.value });
                     }}
-                    erorText="Please enter only 10 digits number"
+                    erorText="Please enter correct email id"
                   />
                 </Grid>
                 <Button
-                color="secondary"
-                variant="contained"
-                sx={{ mt: 3, mb: 2,ml:2 }}
-                sm={4}
-                onClick={checkOtp.statement === true ? checkPass : sendSms}
-              >
-                {checkOtp.name}
-              </Button>
+                  color="secondary"
+                  variant="contained"
+                  sx={{ mt: 3, mb: 2, ml: 2 }}
+                  sm={4}
+                  onClick={checkOtp.statement === true ? checkPass : sendSms}
+                >
+                  {checkOtp.name}
+                </Button>
                 <Grid item xs={6} sm={6}>
                   <TextField
                     fullWidth
+                    required
                     label="OTP"
                     autoComplete="otp"
                     onChange={(e) => {
@@ -186,15 +176,15 @@ const Signup = () => {
                   />
                 </Grid>
 
-                { 
-                    checkOtp.state === true &&
-                    <div class="alert alert-success mt-3 ms-5" role="alert">
-                        Verified!<VerifiedIcon sx={{ml:1 }}/>
-                    </div> 
-                }
+                {checkOtp.state === true && (
+                  <div class="alert alert-success mt-3 ms-5" role="alert">
+                    Verified!
+                    <VerifiedIcon sx={{ ml: 1 }} />
+                  </div>
+                )}
                 <Grid item xs={12}>
                   <FormControl variant="outlined" fullWidth>
-                    <InputLabel htmlFor="outlined-adornment-password">
+                    <InputLabel htmlFor="outlined-adornment-password" required>
                       Password
                     </InputLabel>
                     <OutlinedInput
@@ -233,7 +223,7 @@ const Signup = () => {
                     id="username"
                     autoComplete="username"
                     onChange={(e) => {
-                      setValues({ ...values, username:  e.target.value });
+                      setValues({ ...values, username: e.target.value });
                     }}
                   />
                 </Grid>
@@ -248,9 +238,15 @@ const Signup = () => {
               </Button>
               <div className="d-flex justify-content-between mb-5">
                 <div>
-                  <p onClick={()=>{
-                    navigate("/login")
-                  }} className="text-decoration-none text-secondary" style={{cursor:"pointer"}}>Already a user?</p>
+                  <p
+                    onClick={() => {
+                      navigate("/login");
+                    }}
+                    className="text-decoration-none text-secondary"
+                    style={{ cursor: "pointer" }}
+                  >
+                    Already a user?
+                  </p>
                 </div>
               </div>
             </Box>

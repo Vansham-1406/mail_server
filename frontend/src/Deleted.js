@@ -53,6 +53,8 @@ const Deleted = () => {
     }
   }, []);
 
+  console.log('deleted', mess)
+
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -307,7 +309,20 @@ const Deleted = () => {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {mess.map(
+                      {
+                        
+                      mess.filter((item) => item.Deleted === true).length ===
+                      0 ? (
+                        <TableRow>
+                          <TableCell colSpan={5} align="center">
+                            <div>
+                              <p>No messages are there</p>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ) :
+                      
+                      mess.map(
                         (item) =>
                           item &&
                           item.Deleted === true && (
@@ -365,7 +380,7 @@ const Deleted = () => {
                                     });
                                 }}
                               >
-                                {item?.Subject}
+                                {item?.Subject.length > 8 ? item.Subject.slice(0, 8) + '...' : item.Subject}
                               </TableCell>
                               <TableCell
                                 align="center"
@@ -392,7 +407,7 @@ const Deleted = () => {
                                     });
                                 }}
                               >
-                                {item?.Body}
+                                {item?.Body.length > 12 ? item.Body.slice(0, 12) + '...' : item.Body}
                               </TableCell>
 
                               <TableCell align="right">

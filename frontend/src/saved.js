@@ -44,6 +44,8 @@ const Sav = () => {
   const [mess, setMess] = useState([]);
   const [dt, setDt] = useState(false);
 
+  console.log('saved', mess)
+
   useEffect(() => {
     const items = JSON.parse(localStorage.getItem("userData"));
     if (items) {
@@ -76,7 +78,6 @@ const Sav = () => {
     api();
     // eslint-disable-next-line
   }, [items?.username, mess.length > 0]);
-
 
   var today = new Date();
   const [messageDetails, setMessageDetails] = useState({
@@ -285,7 +286,7 @@ const Sav = () => {
               </div>
             </div>
             <div className={nav ? "dashboard" : "dashboard1"}>
-              {(
+              {
                 <div className="container mt-5">
                   <TableContainer component={Paper}>
                     <Table sx={{ minWidth: 650 }} aria-label="simple table">
@@ -307,174 +308,189 @@ const Sav = () => {
                         </TableRow>
                       </TableHead>
                       <TableBody>
-                        {mess.map(
-                          (item) =>
-                            item &&
-                            item.Saved === true &&
-                            item.Deleted === false && (
-                              <TableRow key={item?.id}>
-                                <TableCell
-                                  component="th"
-                                  scope="row"
-                                  className={
-                                    item?.Opened === false
-                                      ? "fw-bold"
-                                      : "fw-light"
-                                  }
-                                  onMouseOver={(e) => {
-                                    e.target.style.cursor = "pointer";
-                                  }}
-                                  onClick={() => {
-                                    axios
-                                      .put(
-                                        `http://localhost:8450/message/checkOpened`,
-                                        item
-                                      )
-                                      .then((response) => {
-                                        api();
-                                        navigate(`message/${item._id}`);
-                                      })
-                                      .catch((error) => {
-                                        console.log(error);
-                                      });
-                                  }}
-                                >
-                                  {item?.From}
-                                </TableCell>
-                                <TableCell
-                                  align="right"
-                                  className={
-                                    item?.Opened === false
-                                      ? "fw-bold"
-                                      : "fw-light"
-                                  }
-                                  onMouseOver={(e) => {
-                                    e.target.style.cursor = "pointer";
-                                  }}
-                                  onClick={() => {
-                                    axios
-                                      .put(
-                                        `http://localhost:8450/message/checkOpened`,
-                                        item
-                                      )
-                                      .then((response) => {
-                                        api();
-                                        navigate(`message/${item._id}`);
-                                      })
-                                      .catch((error) => {
-                                        console.log(error);
-                                      });
-                                  }}
-                                >
-                                  {item?.Subject}
-                                </TableCell>
-                                <TableCell
-                                  align="center"
-                                  className={
-                                    item?.Opened === false
-                                      ? "fw-bold"
-                                      : "fw-light"
-                                  }
-                                  onMouseOver={(e) => {
-                                    e.target.style.cursor = "pointer";
-                                  }}
-                                  onClick={() => {
-                                    axios
-                                      .put(
-                                        `http://localhost:8450/message/checkOpened`,
-                                        item
-                                      )
-                                      .then((response) => {
-                                        api();
-                                        navigate(`message/${item._id}`);
-                                      })
-                                      .catch((error) => {
-                                        console.log(error);
-                                      });
-                                  }}
-                                >
-                                  {item?.Body}
-                                </TableCell>
+                        {mess.filter((item) => item.Saved && !item.Deleted)
+                          .length === 0 ? (
+                          <TableRow>
+                            <TableCell colSpan={5} align="center">
+                              <div>
+                                <p>No messages are there</p>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ) : (
+                          mess.map(
+                            (item) =>
+                              item &&
+                              item.Saved === true &&
+                              item.Deleted === false && (
+                                <TableRow key={item?.id}>
+                                  <TableCell
+                                    component="th"
+                                    scope="row"
+                                    className={
+                                      item?.Opened === false
+                                        ? "fw-bold"
+                                        : "fw-light"
+                                    }
+                                    onMouseOver={(e) => {
+                                      e.target.style.cursor = "pointer";
+                                    }}
+                                    onClick={() => {
+                                      axios
+                                        .put(
+                                          `http://localhost:8450/message/checkOpened`,
+                                          item
+                                        )
+                                        .then((response) => {
+                                          api();
+                                          navigate(`message/${item._id}`);
+                                        })
+                                        .catch((error) => {
+                                          console.log(error);
+                                        });
+                                    }}
+                                  >
+                                    {item?.From}
+                                  </TableCell>
+                                  <TableCell
+                                    align="right"
+                                    className={
+                                      item?.Opened === false
+                                        ? "fw-bold"
+                                        : "fw-light"
+                                    }
+                                    onMouseOver={(e) => {
+                                      e.target.style.cursor = "pointer";
+                                    }}
+                                    onClick={() => {
+                                      axios
+                                        .put(
+                                          `http://localhost:8450/message/checkOpened`,
+                                          item
+                                        )
+                                        .then((response) => {
+                                          api();
+                                          navigate(`message/${item._id}`);
+                                        })
+                                        .catch((error) => {
+                                          console.log(error);
+                                        });
+                                    }}
+                                  >
+                                    {item?.Subject.length > 8
+                                      ? item.Subject.slice(0, 8) + "..."
+                                      : item.Subject}
+                                  </TableCell>
+                                  <TableCell
+                                    align="center"
+                                    className={
+                                      item?.Opened === false
+                                        ? "fw-bold"
+                                        : "fw-light"
+                                    }
+                                    onMouseOver={(e) => {
+                                      e.target.style.cursor = "pointer";
+                                    }}
+                                    onClick={() => {
+                                      axios
+                                        .put(
+                                          `http://localhost:8450/message/checkOpened`,
+                                          item
+                                        )
+                                        .then((response) => {
+                                          api();
+                                          navigate(`message/${item._id}`);
+                                        })
+                                        .catch((error) => {
+                                          console.log(error);
+                                        });
+                                    }}
+                                  >
+                                    {item?.Body.length > 12
+                                      ? item.Body.slice(0, 12) + "..."
+                                      : item.Body}
+                                  </TableCell>
 
-                                <TableCell align="right">
-                                  {item?.Saved === true ? (
-                                    <StarRateIcon
-                                      style={{ color: "gold" }}
-                                      className="fs-1 cursor_pointer"
-                                      onClick={() => {
-                                        axios
-                                          .put(
-                                            `http://localhost:8450/message/checkSaveTrue`,
-                                            item
-                                          )
-                                          .then((response) => {
-                                            api();
-                                          })
-                                          .catch((error) => {
-                                            console.log(error);
-                                          });
-                                      }}
-                                    />
-                                  ) : (
-                                    <StarRateIcon
-                                      style={{ color: "gray" }}
-                                      className="fs-1 cursor_pointer"
-                                      onClick={() => {
-                                        axios
-                                          .put(
-                                            "http://localhost:8450/message/checkSave",
-                                            item
-                                          )
-                                          .then((response) => {
-                                            api();
-                                          })
-                                          .catch((error) => {
-                                            console.log(error);
-                                          });
-                                      }}
-                                    />
-                                  )}
-                                </TableCell>
-                                <TableCell align="right">
-                                  {item?.Deleted === false && (
-                                    <DeleteIcon
-                                      style={{ color: "gray" }}
-                                      className="fs-1 cursor_pointer"
-                                      onClick={() => {
-                                        axios
-                                          .put(
-                                            "http://localhost:8450/message/checkDel2",
-                                            item
-                                          )
-                                          .then((response) => {
-                                            api();
-                                          })
-                                          .catch((error) => {
-                                            console.log(error);
-                                          });
-                                      }}
-                                    />
-                                  )}
-                                </TableCell>
-                              </TableRow>
-                            )
+                                  <TableCell align="right">
+                                    {item?.Saved === true ? (
+                                      <StarRateIcon
+                                        style={{ color: "gold" }}
+                                        className="fs-1 cursor_pointer"
+                                        onClick={() => {
+                                          axios
+                                            .put(
+                                              `http://localhost:8450/message/checkSaveTrue`,
+                                              item
+                                            )
+                                            .then((response) => {
+                                              api();
+                                            })
+                                            .catch((error) => {
+                                              console.log(error);
+                                            });
+                                        }}
+                                      />
+                                    ) : (
+                                      <StarRateIcon
+                                        style={{ color: "gray" }}
+                                        className="fs-1 cursor_pointer"
+                                        onClick={() => {
+                                          axios
+                                            .put(
+                                              "http://localhost:8450/message/checkSave",
+                                              item
+                                            )
+                                            .then((response) => {
+                                              api();
+                                            })
+                                            .catch((error) => {
+                                              console.log(error);
+                                            });
+                                        }}
+                                      />
+                                    )}
+                                  </TableCell>
+                                  <TableCell align="right">
+                                    {item?.Deleted === false && (
+                                      <DeleteIcon
+                                        style={{ color: "gray" }}
+                                        className="fs-1 cursor_pointer"
+                                        onClick={() => {
+                                          axios
+                                            .put(
+                                              "http://localhost:8450/message/checkDel2",
+                                              item
+                                            )
+                                            .then((response) => {
+                                              api();
+                                            })
+                                            .catch((error) => {
+                                              console.log(error);
+                                            });
+                                        }}
+                                      />
+                                    )}
+                                  </TableCell>
+                                </TableRow>
+                              )
+                          )
                         )}
                       </TableBody>
                     </Table>
                   </TableContainer>
                 </div>
-              // ) : (
-              //   <div className="ms-5 mt-5">
-              //     <img
-              //       src="mess.jpg"
-              //       className="img-fluid"
-              //       width="500px"
-              //       alt="No message"
-              //     />
-              //     <h1 className="fw-bold mt-4">No message found!</h1>
-              //   </div>
-              // )}
-                                    )}
+                // ) : (
+                //   <div className="ms-5 mt-5">
+                //     <img
+                //       src="mess.jpg"
+                //       className="img-fluid"
+                //       width="500px"
+                //       alt="No message"
+                //     />
+                //     <h1 className="fw-bold mt-4">No message found!</h1>
+                //   </div>
+                // )}
+              }
             </div>
           </div>
         </div>

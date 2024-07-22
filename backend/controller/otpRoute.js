@@ -1,65 +1,77 @@
-const fast2sms = require("fast-two-sms");
 const User = require("../model/userModel");
+const nodemailer = require("nodemailer");
+
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: "vanshamaggarwal697@gmail.com",
+    pass: "wmtn fkpv fytt clrw",
+  },
+});
+
 exports.otpSignUp = async (req, res) => {
-    try 
-    {
-        const {number} = req.body;
+  try {
+    const { email } = req.body;
 
-        const login = await User.findOne({mobileNum : number})
+    const login = await User.findOne({ email: email });
+    if (login) {
+      return res.status(400).json({ msg: "User already registered" });
+    } else {
+      const otp = Math.floor(Math.random() * (9999 - 1000) + 1000);
+      var mailOptions = {
+        from: "vanshamaggarwal697@gmail.com",
+        to: email,
+        subject: "Verification from mailieft",
+        text: `Your OTP is: ${otp}
+Regards,
+Mailiefy
+                `,
+      };
 
-        if(login)
-        {
-            return res.status(400).json({msg : "User already registered"})
+      transporter.sendMail(mailOptions, function (err, info) {
+        if (err) {
+          return res.status(400).json({ msg: err, msg1: "not working" });
+        } else {
+          return res.status(200).json({ otp: otp, msg: "otp" });
         }
-        else
-        {
-            const otp = Math.floor(Math.random() * (9999 - 1000) + 1000);
-            var options = {
-              authorization: "KXymvztPUxH9biCd5j4LMaYpRBQ31wVl0csfSZ7h2IAu6WToOrnt0WqdUgZuB1SfLPsAVwE28XJo9CrI",
-              message: `${otp}. Message from Mailiefy! Enter the number to register.`,
-              numbers: [number],
-            };
-            // send this message
-            fast2sms.sendMessage(options)
-            .then((response) => {console.log(response, "sms sent");})
-            .catch((error) => {console.log(error);});
-            return res.status(200).json({otp:otp,msg:"otp"})
-        }
-    } 
-    catch (error) 
-    {
-        return res.status(400).json({msg:"failed"})
+      });
     }
+  } catch (error) {
+    return res.status(400).json({ msg: "failed" });
+  }
 };
 
-exports.otpLogin = async (req,res) => {
-    try 
-    {
-        const {number} = req.body;
+exports.otpLogin = async (req, res) => {
+  try {
+    const { email } = req.body;
 
-        const login = await User.findOne({mobileNum : number})
+    const login = await User.findOne({ email: email });
 
-        if(login)
-        {
-            const otp = Math.floor(Math.random() * (9999 - 1000) + 1000);
-            var options = {
-              authorization: "KXymvztPUxH9biCd5j4LMaYpRBQ31wVl0csfSZ7h2IAu6WToOrnt0WqdUgZuB1SfLPsAVwE28XJo9CrI",
-              message: `${otp}. Message from Whatiefy! Enter the number to register.`,
-              numbers: [number],
-            };
-            // send this message
-            fast2sms.sendMessage(options)
-            .then((response) => {console.log(response, "sms sent");})
-            .catch((error) => {console.log(error);});
-            return res.status(200).json({otp:otp,msg:"otp"})
+    if (login) {
+      const otp = Math.floor(Math.random() * (9999 - 1000) + 1000);
+      var mailOptions = {
+        from: "vanshamaggarwal697@gmail.com",
+        to: email,
+        subject: "Verification from mailieft",
+        text: `Your OTP is: ${otp}
+    Regards,
+    Mailiefy
+                    `,
+      };
+
+      transporter.sendMail(mailOptions, function (err, info) {
+        if (err) {
+          return res.status(400).json({ msg: err, msg1: "not working" });
+        } else {
+          return res.status(200).json({ otp: otp, msg: "otp" });
         }
-        else
-        {
-            return res.status(400).json({msg : "Mobile Number not found, Please Register!"})
-        }
-    } 
-    catch (error) 
-    {
-        return res.status(400).json({msg:"failed"})
+      });
     }
-}
+    else
+    {
+        return res.status(400).json({ msg:"User does not exist" });
+    }
+  } catch (error) {
+    return res.status(400).json({ msg: "failed" });
+  }
+};

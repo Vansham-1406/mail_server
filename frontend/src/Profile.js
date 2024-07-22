@@ -68,7 +68,7 @@ const Profile = () => {
   const handleClose1 = () => setOpen1(false);
 
   const [user, setUser] = useState({
-    mobile: "",
+    email: "",
     password: "",
   });
   const [otp, setOtp] = useState();
@@ -136,17 +136,22 @@ const Profile = () => {
   };
 
   const sendMobile = () => {
-    axios
-      .post("http://localhost:8450/otpLogin", {
-        number: items?.mobileNum,
-      })
-      .then((res) => {
-        setOtp(res.data.otp);
-        setOtpChecker({ validateMobile: false, otpSent: true });
-      })
-      .catch((err) => {
-        alert(`${err.response.data.msg}`);
-      });
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (items?.email && emailPattern.test(items?.email)) {
+      axios
+        .post("http://localhost:8450/otpLogin", {
+          email: items?.email,
+        })
+        .then((res) => {
+          setOtp(res.data.otp);
+          setOtpChecker({ validateEmail: false, otpSent: true });
+        })
+        .catch((err) => {
+          alert(`${err.response.data.msg}`);
+        });
+    } else {
+      alert("Enter a valid email address");
+    }
   };
 
   const checkOtp = () => {
@@ -380,9 +385,9 @@ const Profile = () => {
                     </TableRow>
                     <TableRow>
                       <TableCell component="th" scope="row">
-                        <b>Mobile Number</b>
+                        <b>Email</b>
                       </TableCell>
-                      <TableCell align="right">{items?.mobileNum}</TableCell>
+                      <TableCell align="right">{items?.email}</TableCell>
                     </TableRow>
                     <TableRow>
                       <TableCell component="th" scope="row">
@@ -408,18 +413,11 @@ const Profile = () => {
                                 <h4 className=" mb-4">Account Recovery</h4>
                                 <TextField
                                   style={{ width: "350px" }}
-                                  label="Mobile Number"
+                                  label="Email"
                                   id="outlined-start-adornment"
-                                  name="mobile"
-                                  autoComplete="mobile"
-                                  InputProps={{
-                                    startAdornment: (
-                                      <InputAdornment position="start">
-                                        +91
-                                      </InputAdornment>
-                                    ),
-                                  }}
-                                  value={parseInt(items.mobileNum)}
+                                  name="email"
+                                  autoComplete="email"
+                                  value={items?.email}
                                   
                                   readOnly
                                 />

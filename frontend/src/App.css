@@ -38,7 +38,6 @@
 }
 
 .mainNav{
-    width: 100vw;
     background-color: #1876D1;
     transition: .4s margin ease;
 }

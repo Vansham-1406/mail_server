@@ -53,7 +53,6 @@ const Message = () => {
   const handleClose = () => setOpen(false);
 
   const params = useParams();
-  console.log('params',params)
 
   const api = () => {
     axios
@@ -72,7 +71,7 @@ const Message = () => {
   useEffect(() => {
     api();
     // eslint-disable-next-line
-  }, [params.id]);
+  }, [params?.id]);
 
   var today = new Date();
   const [messageDetails, setMessageDetails] = useState({
@@ -224,7 +223,11 @@ const Message = () => {
                     aria-describedby="modal-modal-description"
                   >
                     <Box
-                      sx={style}
+                      sx={{
+                        ...style,
+                        maxHeight: "70vh", // or any other value based on your design
+                        overflowY: "auto",
+                      }}
                       className="d-flex flex-column justify-content-center align-items-center"
                     >
                       <h4 className="text-center fw-bold">Send a Message</h4>
@@ -258,7 +261,7 @@ const Message = () => {
                         aria-label="minimum height"
                         minRows={3}
                         placeholder="Body"
-                        style={{ width: 350 }}
+                        style={{ width: 350,padding:"20px" }}
                         className="mt-5 p-2"
                         onChange={(e) => {
                           setMessageDetails({
@@ -359,8 +362,7 @@ const Message = () => {
                                       });
                                   }}
                                 />
-                              ):
-                              (
+                              ) : (
                                 <DeleteIcon
                                   style={{ color: "red" }}
                                   className="fs-1 cursor_pointer"
@@ -383,13 +385,12 @@ const Message = () => {
                           </Tooltip>
                         </div>
                         <div>
-                          <Tooltip
-                            title="Print"
-                            onClick={() => {
-                              window.print();
-                            }}
-                          >
-                            <IconButton>
+                          <Tooltip title="Print">
+                            <IconButton
+                              onClick={() => {
+                                window.print();
+                              }}
+                            >
                               <PrintIcon className="fs-3" />
                             </IconButton>
                           </Tooltip>
@@ -398,7 +399,7 @@ const Message = () => {
                     </Card>
                   </div>
                   <div className="mt-5">
-                    <Card sx={{ maxWidth: "60%", minWidth: 300 }}>
+                    <Card sx={{ maxWidth: "100%", minWidth: 300, width: "100%" }}>
                       <div className="d-flex flex-column mt-4 mb-4 ps-3">
                         <div className="d-flex justify-content-between pe-3">
                           <h6 className="">
@@ -427,7 +428,15 @@ const Message = () => {
                         <h5 className="mb-4 mt-3">
                           Subject - <b>{singleMess?.Subject}</b>
                         </h5>
-                        <h4 className="mb-4" style={{ whiteSpace: "pre-line" }}>
+                        <h4
+                          className="mb-4"
+                          style={{
+                            whiteSpace: "normal",
+                            wordBreak:"break-word",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                          }}
+                        >
                           {singleMess?.Body}
                         </h4>
                       </div>
